@@ -1,0 +1,15 @@
+{
+  "name": "cjs-cdn",
+  "version": "0.1.0",
+  "description": "",
+  "dependencies": {
+    "moment": "^2.17.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.0.0",
+    "pump": "^1.0.2"
+  }
+}
