@@ -1,3 +1,4 @@
+;!(function() {
 
 var current = moment(Date.now());
 var weekTime = 1000*60*60*24*7;
@@ -44,19 +45,12 @@ function pad(str) {
 
 function setup() {
     if (initCurrent()) {
-        var cont = document.createElement('div');
-        var prev = '<a href="#" onclick="prevWeek()">prev</a>';
-        var next = '<a href="#" onclick="nextWeek()">next</a>';
-        var options = '', val;
-        for (var i = 0; i < current.weeksInYear(); i++) {
-            val = i+1;
-            options += '<option value="' + val + '">' + val + '</option>';
-        }
-        var select = '<select id="weeks" onchange="weekChanged()">' + options + '</select>';
-        cont.innerHTML = prev + ' ' + select + ' ' + next;
-        cont.style.position = 'fixed';
-        cont.style.right = '20px';
-        document.body.appendChild(cont);
+        var el = document.createElement('td');
+        el.innerHTML = generateSelectOptions();
+        el.width = '120';
+        var cont = document.querySelector('#TimeHeader > table > tbody > tr');
+        var lastSibling = cont.children[cont.children.length-1];
+        cont.insertBefore(el, lastSibling);
         document.querySelector('#weeks').value = current.week();
     }
 }
@@ -77,3 +71,23 @@ function initCurrent() {
         return false;
     }
 }
+
+function generateSelectOptions() {
+    var prev = '<a href="#" onclick="fox.prevWeek()">prev</a>';
+    var next = '<a href="#" onclick="fox.nextWeek()">next</a>';
+    var options = '', val;
+    for (var i = 0; i < current.weeksInYear(); i++) {
+        val = i+1;
+        options += '<option value="' + val + '">' + val + '</option>';
+    }
+    var select = '<select id="weeks" onchange="fox.weekChanged()">' + options + '</select>';
+    return prev + ' ' + select + ' ' + next;
+}
+
+window.fox = {
+    prevWeek: prevWeek,
+    nextWeek: nextWeek,
+    weekChanged: weekChanged
+};
+
+})();
