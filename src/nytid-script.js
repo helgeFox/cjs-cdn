@@ -49,7 +49,7 @@ function setup() {
         el.innerHTML = generateSelectOptions();
         el.width = '120';
         var cont = document.querySelector('#TimeHeader > table > tbody > tr');
-        var lastSibling = cont.children[cont.children.length-1];
+        var lastSibling = cont.children[cont.children.length-2];
         cont.insertBefore(el, lastSibling);
         document.querySelector('#weeks').value = current.week();
     }

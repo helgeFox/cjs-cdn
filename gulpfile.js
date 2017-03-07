@@ -2,27 +2,53 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
-var pump = require('pump');
+var exec = require('child_process').exec;
 
 var files = [
-  './node_modules/moment/min/moment.min.js', 
-  './node_modules/moment/locale/nb.js',
-  './src/nytid-script.js'
+	'./node_modules/moment/min/moment.min.js', 
+	'./node_modules/moment/locale/nb.js',
+	'./src/nytid-script.js'
 ];
 var scriptName = 'nytid-cjs-scripts.js';
+var assets = [
+	'./src/icons/*'
+];
 var destination = './dist/';
- 
+
 gulp.task('scripts', function() {
-  gulp.src(files)
-    .pipe(concat(scriptName))
-    .pipe(rename({suffix: '.min'}))
-    .pipe(uglify())
-    .pipe(gulp.dest(destination))
+	gulp.src(files)
+	.pipe(concat(scriptName))
+	.pipe(rename({suffix: '.min'}))
+	.pipe(uglify())
+	.pipe(gulp.dest(destination));
 });
 
-// Procedure for release:
-//  1. In terminal navigate to ./dist
-//  2. Type 'now'
-//  3. (Optional) Type 'now alias ' + the newly created adress + ' cjs-cdn.now.sh'
+gulp.task('assets', function () {
+	gulp.src(assets)
+	.pipe(gulp.dest(destination + '/icons'));
+});
 
-gulp.task('default', ['scripts']);
+gulp.task('pkg', function () {
+	gulp.src('./package.json')
+	.pipe(gulp.dest(destination));
+});
+
+gulp.task('deploy', function () {
+	exec('now', {cwd: './dist'}, function (err, stdout, stderr) {
+		if (err) {
+			console.error('Deploy failed... ', err);
+			return;
+		}
+		console.log('Deploy to now.sh successful\nURL: ' + stdout);
+		exec('now alias set ' + stdout + ' cjs-cdn.now.sh', {cwd: './dist'}, function (err, stdout, stderr) {
+			if (err) {
+				console.error('Now-alias failed!', err);
+				return;
+			}
+			console.log('Now-alias successful');
+		});
+	});
+});
+
+gulp.task('default', ['scripts', 'assets']);
+gulp.task('release', ['scripts', 'assets', 'pkg', 'deploy']);
