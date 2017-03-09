@@ -29,12 +29,13 @@ gulp.task('assets', function () {
 });
 
 gulp.task('pkg', function () {
-	gulp.src('./package.json')
-	.pipe(gulp.dest(destination));
+	// Wait... Deploying *with* the package file requires more setup. Read https://zeit.co/blog/now-static
+	// gulp.src('./package.json')
+	// .pipe(gulp.dest(destination));
 });
 
 gulp.task('deploy', function () {
-	exec('now', {cwd: './dist'}, function (err, stdout, stderr) {
+	exec('now -n cjs-cdn --static', {cwd: './dist'}, function (err, stdout, stderr) {
 		if (err) {
 			console.error('Deploy failed... ', err);
 			return;

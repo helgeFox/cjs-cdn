@@ -5,12 +5,6 @@
   "engines": {
     "node": "6.x.x"
   },
-  "scripts": {
-    "start": "serve ./content"
-  },
-  "dependencies": {
-    "serve": "latest"
-  },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
