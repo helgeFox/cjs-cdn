@@ -55,12 +55,10 @@ function pad(str) {
 function setup() {
     if (initCurrent()) {
         setupStyles();
-        var el = document.createElement('td');
-        el.innerHTML = generateSelectOptions();
-        el.width = '120';
         var cont = document.querySelector('#TimeHeader > table > tbody > tr');
-        var lastSibling = cont.children[cont.children.length-2];
-        cont.insertBefore(el, lastSibling);
+        var el = cont.children[1];
+        el.width = '120';
+        el.innerHTML = generateHtml();
         document.querySelector('#weeks').value = current.week();
     }
 }
@@ -98,7 +96,7 @@ function setupStyles() {
     document.querySelector('head').appendChild(el);
 }
 
-function generateSelectOptions() {
+function generateHtml() {
     var prev = '<a href="#" onclick="fox.prevWeek()" class="week-nav prev-week-btn">prev</a>';
     var next = '<a href="#" onclick="fox.nextWeek()" class="week-nav next-week-btn">next</a>';
     var options = '', val;
@@ -107,7 +105,7 @@ function generateSelectOptions() {
         options += '<option value="' + val + '">' + val + '</option>';
     }
     var select = '<select id="weeks" onchange="fox.weekChanged()">' + options + '</select>';
-    return prev + ' ' + select + ' ' + next;
+    return 'Ukenr.: ' + prev + ' ' + select + ' ' + next;
 }
 
 window.fox = {
