@@ -1,5 +1,14 @@
 ;!(function() {
 
+/*
+    Credits:
+    Icon 'Right' by sunbzy from the Noun Project
+    Icon 'Left' by sunbzy from the Noun Project
+
+
+    Arrow by Arthur Shlain from the Noun Project
+ */
+
 var current = moment(Date.now());
 var weekTime = 1000*60*60*24*7;
 
@@ -45,6 +54,7 @@ function pad(str) {
 
 function setup() {
     if (initCurrent()) {
+        setupStyles();
         var el = document.createElement('td');
         el.innerHTML = generateSelectOptions();
         el.width = '120';
@@ -72,9 +82,25 @@ function initCurrent() {
     }
 }
 
+function setupStyles() {
+    var style = ".week-nav {" +
+        "text-indent: -9999px;" +
+        "display: inline-block;" +
+        "background-repeat: no-repeat;" +
+        "background-size: contain;" +
+        "width: 15px;" +
+        "height: 15px;" +
+        "}";
+    style += ".prev-week-btn { background-image: url(https://cjs-cdn.now.sh/icons/left-arrow.svg); }";
+    style += ".next-week-btn { background-image: url(https://cjs-cdn.now.sh/icons/right-arrow.svg); }";
+    var el = document.createElement('style');
+    el.innerHTML = style;
+    document.querySelector('head').appendChild(el);
+}
+
 function generateSelectOptions() {
-    var prev = '<a href="#" onclick="fox.prevWeek()">prev</a>';
-    var next = '<a href="#" onclick="fox.nextWeek()">next</a>';
+    var prev = '<a href="#" onclick="fox.prevWeek()" class="week-nav prev-week-btn">prev</a>';
+    var next = '<a href="#" onclick="fox.nextWeek()" class="week-nav next-week-btn">next</a>';
     var options = '', val;
     for (var i = 0; i < current.weeksInYear(); i++) {
         val = i+1;
