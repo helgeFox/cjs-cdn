@@ -57,7 +57,7 @@ function setup() {
         setupStyles();
         var cont = document.querySelector('#TimeHeader > table > tbody > tr');
         var el = cont.children[1];
-        el.width = '120';
+        el.width = '150';
         el.innerHTML = generateHtml();
         document.querySelector('#weeks').value = current.week();
     }
@@ -105,7 +105,7 @@ function generateHtml() {
         options += '<option value="' + val + '">' + val + '</option>';
     }
     var select = '<select id="weeks" onchange="fox.weekChanged()">' + options + '</select>';
-    return 'Ukenr.: ' + prev + ' ' + select + ' ' + next;
+    return 'Week: ' + prev + ' ' + select + ' ' + next;
 }
 
 window.fox = {
