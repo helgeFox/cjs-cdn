@@ -5,8 +5,9 @@ var del = require('del');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
-var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 
+var baseUrl;
 var destination = './dist/';
 var paths = {
 	scripts: {
@@ -49,31 +50,63 @@ function pkg () {
 	// .pipe(gulp.dest(destination));
 }
 
-function deploy() {
+function upload() {
+	let cmd, args, options, child, output;
 	return new Promise(function(resolve, reject) {
-		exec('now -n cjs-cdn --static', {cwd: './dist'}, function (err, stdout, stderr) {
-			if (err) {
-				console.error('Deploy failed... ', err);
-				reject(err);
-				return;
+		cmd = 'now';
+		args = ['-n', 'cjs-cdn', '--static', '--public'];
+		options = {cwd: './dist'};
+		child = spawn(cmd, args, options);
+		child.stdout.on('data', function (data) {
+			let str = data.toString();
+			output += str;
+			if (str.indexOf('https://') === 0) {
+				baseUrl = str;
 			}
-			console.log('Deploy to now.sh successful\nURL: ' + stdout);
-			exec('now alias set ' + stdout.replace('https://', '') + ' cjs-cdn.now.sh', {cwd: './dist'}, function (err, stdout, stderr) {
-				if (err) {
-					console.error('Now-alias failed!', err);
-					reject(err);
-					return;
-				}
-				console.log('Now-alias successful');
-				resolve();
-			});
+			// console.log(str);
+		});
+		child.stdout.on('error', function (err) {
+			reject(err);
+		});
+		child.stdout.on('close', function () {
+			resolve(output);
 		});
 	});
 }
+
+function alias() {
+	let cmd, args, options, child, output;
+	return new Promise(function(resolve, reject) {
+		if (!baseUrl) {
+			reject('No domain name set for \'alias\' to use...');
+			return;
+		}
+		cmd = 'now';
+		args = ['alias', 'set', baseUrl.replace('https://', ''), 'cjs-cdn.now.sh'];
+		options = {cwd: './dist'};
+		child = spawn(cmd, args, options);
+		child.stdout.on('data', function (data) {
+			output += data.toString();
+		});
+		child.stdout.on('error', function (err) {
+			reject(err);
+		});
+		child.stdout.on('close', function () {
+			resolve(output);
+		});
+	});
+}
+
+function delay() {
+	return new Promise(function (resolve/*, reject*/) {
+		setTimeout(resolve, 2000);
+	});
+}
+
+var deploy = gulp.series(upload, delay, alias);
 gulp.task('deploy', deploy);
 
 var build = gulp.series(clean, gulp.parallel(scripts, assets));
 var release = gulp.series(build, deploy);
-
 gulp.task('default', release);
 gulp.task('release', release);
