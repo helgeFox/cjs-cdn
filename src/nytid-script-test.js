@@ -58,7 +58,7 @@ function setup() {
         var cont = document.querySelector('#TimeHeader > table > tbody');
         cont.appendChild(document.createElement('tr'));
         cont = cont.querySelectorAll('tr')[1];
-        cont.innerHTML = '<td></td><td width="90"></td><td></td><td></td>';
+        cont.innerHTML = '<td></td><td></td><td></td><td></td>';
         var el = cont.children[1];
         el.innerHTML = generateHtml();
         document.querySelector('#weeks').value = current.week();

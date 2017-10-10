@@ -27,16 +27,54 @@ var paths = {
 	}
 };
 
+
+var multiPaths = {
+	'nytid-script': {
+		src: [
+			'./node_modules/moment/min/moment.min.js', 
+			'./node_modules/moment/locale/nb.js',
+			'./src/nytid-script.js'
+		],
+		name: 'nytid-cjs-scripts.js',
+		dest: destination
+	},
+	'nytid-script-test': {
+		src: [
+			'./node_modules/moment/min/moment.min.js', 
+			'./node_modules/moment/locale/nb.js',
+			'./src/nytid-script-test.js'
+		],
+		name: 'nytid-cjs-scripts-test.js',
+		dest: destination
+	}
+};
+
 function clean () {
 	return del([destination + '**/*']);
 }
 
+function scriptPart(obj) {
+	return function() {
+		return gulp.src(obj.src)
+		.pipe(concat(obj.name))
+		.pipe(rename({suffix: '.min'}))
+		.pipe(uglify())
+		.pipe(gulp.dest(obj.dest));
+	}
+}
+
 function scripts () {
-	return gulp.src(paths.scripts.src)
-	.pipe(concat(paths.scripts.name))
-	.pipe(rename({suffix: '.min'}))
-	.pipe(uglify())
-	.pipe(gulp.dest(paths.scripts.dest));
+	// return gulp.src(paths.scripts.src)
+	// .pipe(concat(paths.scripts.name))
+	// .pipe(rename({suffix: '.min'}))
+	// .pipe(uglify())
+	// .pipe(gulp.dest(paths.scripts.dest));
+	let all = [];
+	for (let prop in multiPaths) {
+		let value = multiPaths[prop];
+		all.push(scriptPart(value));
+	}
+	return gulp.parallel(all);
 }
 
 function assets () {
@@ -106,7 +144,15 @@ function delay() {
 var deploy = gulp.series(upload, delay, alias);
 gulp.task('deploy', deploy);
 
-var build = gulp.series(clean, gulp.parallel(scripts, assets));
+let all = [];
+for (let prop in multiPaths) {
+	let value = multiPaths[prop];
+	all.push(scriptPart(value));
+}
+all.push(assets);
+var allScripts = gulp.parallel(all);
+
+var build = gulp.series(clean, allScripts, assets);
 var release = gulp.series(build, deploy);
 gulp.task('default', release);
 gulp.task('release', release);
