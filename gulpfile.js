@@ -9,26 +9,8 @@ var spawn = require('child_process').spawn;
 
 var baseUrl;
 var destination = './dist/';
-var paths = {
-	scripts: {
-		src: [
-			'./node_modules/moment/min/moment.min.js', 
-			'./node_modules/moment/locale/nb.js',
-			'./src/nytid-script.js'
-		],
-		name: 'nytid-cjs-scripts.js',
-		dest: destination
-	},
-	assets: {
-		src: [
-			'./src/icons/*'
-		],
-		dest: destination + '/icons'
-	}
-};
 
-
-var multiPaths = {
+var scriptPaths = {
 	'nytid-script': {
 		src: [
 			'./node_modules/moment/min/moment.min.js', 
@@ -45,6 +27,15 @@ var multiPaths = {
 			'./src/nytid-script-test.js'
 		],
 		name: 'nytid-cjs-scripts-test.js',
+		dest: destination
+	},
+	'show-modal-dialog-polyfill': {
+		src: [
+			'./node_modules/jquery/dist/jquery.min.js',
+			'./node_modules/knockout/build/output/knockout-latest.debug.js',
+			'./src/showModalDialogPolyfill.js'
+		],
+		name: 'showModalDialogPolyfill.js',
 		dest: destination
 	}
 };
@@ -63,29 +54,9 @@ function scriptPart(obj) {
 	}
 }
 
-function scripts () {
-	// return gulp.src(paths.scripts.src)
-	// .pipe(concat(paths.scripts.name))
-	// .pipe(rename({suffix: '.min'}))
-	// .pipe(uglify())
-	// .pipe(gulp.dest(paths.scripts.dest));
-	let all = [];
-	for (let prop in multiPaths) {
-		let value = multiPaths[prop];
-		all.push(scriptPart(value));
-	}
-	return gulp.parallel(all);
-}
-
 function assets () {
-	return gulp.src(paths.assets.src)
-	.pipe(gulp.dest(paths.assets.dest));
-}
-
-function pkg () {
-	// Wait... Deploying *with* the package file requires more setup. Read https://zeit.co/blog/now-static
-	// gulp.src('./package.json')
-	// .pipe(gulp.dest(destination));
+	return gulp.src('./src/icons/*')
+	.pipe(gulp.dest(destination + '/icons'));
 }
 
 function upload() {
@@ -145,8 +116,8 @@ var deploy = gulp.series(upload, delay, alias);
 gulp.task('deploy', deploy);
 
 let all = [];
-for (let prop in multiPaths) {
-	let value = multiPaths[prop];
+for (let prop in scriptPaths) {
+	let value = scriptPaths[prop];
 	all.push(scriptPart(value));
 }
 all.push(assets);
@@ -154,5 +125,6 @@ var allScripts = gulp.parallel(all);
 
 var build = gulp.series(clean, allScripts, assets);
 var release = gulp.series(build, deploy);
+gulp.task('build', build);
 gulp.task('default', release);
 gulp.task('release', release);
